@@ -73,26 +73,18 @@ public class ForecastFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        ArrayList<String> forecastEntries = new ArrayList<String>();
-        forecastEntries.add("Today - Sunny - 88/63");
-        forecastEntries.add("Tomorrow - Foggy - 70/46");
-        forecastEntries.add("Weds - Cloudy - 72/62");
-        forecastEntries.add("Thurs - Rainy - 64/51");
-        forecastEntries.add("Fri - Foggy - 70/46");
-        forecastEntries.add("Sat - Sunny - 76/83");
-
         mForecastAdapter = new ArrayAdapter<String>(
                 // The current context (this fragment's parent activity)
                 getActivity(),
                 // ID of List item layout
                 R.layout.list_item_forecast,
                 // ID of the textview to populate
-                R.id.list_item_forecast_textview,
-                // Forecast data
-                forecastEntries);
+                R.id.list_item_forecast_textview);
 
         ListView listView = (ListView)rootView.findViewById(R.id.listview_forecast);
         listView.setAdapter(mForecastAdapter);
+
+        new FetchWeatherTask().execute("94043");
 
         return rootView;
     }
@@ -193,12 +185,22 @@ public class ForecastFragment extends Fragment {
                 resultStrs[i] = day + " - " + description + " - " + highAndLow;
             }
 
+/*
             for (String s : resultStrs) {
                 Log.v(LOG_TAG, "Forecast entry: " + s);
             }
+*/
             return resultStrs;
-
         }
+
+        @Override
+        protected void onPostExecute(String[] strings) {
+            if (strings != null) {
+                mForecastAdapter.clear();
+                mForecastAdapter.addAll(strings);
+            }
+        }
+
         @Override
         protected String[] doInBackground(String... params) {
 
