@@ -61,6 +61,12 @@ public class ForecastFragment extends Fragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        updateWeather();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -68,13 +74,7 @@ public class ForecastFragment extends Fragment {
         int id = item.getItemId();
 
         if (id == R.id.action_refresh) {
-            // Get location from settings
-            String location = PreferenceManager
-                    .getDefaultSharedPreferences(getActivity())
-                    .getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
-
-            // Execute fetch weather task
-            new FetchWeatherTask().execute(location);
+            updateWeather();
             return true;
         }
 
@@ -86,6 +86,7 @@ public class ForecastFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
+        // Create an adapter to handle display of items in the list
         mForecastAdapter = new ArrayAdapter<String>(
                 // The current context (this fragment's parent activity)
                 getActivity(),
@@ -96,6 +97,8 @@ public class ForecastFragment extends Fragment {
 
         ListView listView = (ListView)rootView.findViewById(R.id.listview_forecast);
         listView.setAdapter(mForecastAdapter);
+
+        // Set an on item click listener which makes the detail activity appear when clicking a list item
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long l) {
@@ -113,23 +116,20 @@ public class ForecastFragment extends Fragment {
                 else {
                     Log.v(LOG_TAG, "Cannot resolve detail activity");
                 }
-
-/*
-                int duration = Toast.LENGTH_SHORT;
-                Toast toast = Toast.makeText(getActivity(), forecast, duration);
-                toast.show();
-*/
             }
         });
 
+        return rootView;
+    }
+
+    private void updateWeather() {
         // Get location from settings
         String location = PreferenceManager
                 .getDefaultSharedPreferences(getActivity())
                 .getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
 
+        // Execute fetch weather task
         new FetchWeatherTask().execute(location);
-
-        return rootView;
     }
 
     public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
