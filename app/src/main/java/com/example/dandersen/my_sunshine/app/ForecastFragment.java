@@ -1,6 +1,7 @@
 package com.example.dandersen.my_sunshine.app;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -41,6 +42,7 @@ import java.util.List;
 public class ForecastFragment extends Fragment {
 
     private ArrayAdapter<String> mForecastAdapter;
+    private final String LOG_TAG = ForecastFragment.class.getSimpleName();
 
     public ForecastFragment() {
     }
@@ -95,10 +97,22 @@ public class ForecastFragment extends Fragment {
                 CharSequence forecast = ((TextView)view).getText();
                 // Can also be done this way by using the adapter:
                 // String forecast = mForecastAdapter.getItem(position);
-                int duration = Toast.LENGTH_SHORT;
 
+                // Start detail activity with explicit intent
+                Intent openDetailActivityIntent = new Intent(getActivity(), DetailActivity.class);
+                openDetailActivityIntent.putExtra(Intent.EXTRA_TEXT, forecast);
+                if (openDetailActivityIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                    startActivity(openDetailActivityIntent);
+                }
+                else {
+                    Log.v(LOG_TAG, "Cannot resolve detail activity");
+                }
+
+/*
+                int duration = Toast.LENGTH_SHORT;
                 Toast toast = Toast.makeText(getActivity(), forecast, duration);
                 toast.show();
+*/
             }
         });
 
