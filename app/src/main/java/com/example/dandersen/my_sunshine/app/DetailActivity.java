@@ -1,5 +1,6 @@
 package com.example.dandersen.my_sunshine.app;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -34,6 +35,9 @@ public class DetailActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            // Start settings activity with explicit intent
+            Intent openSettingsActivityIntent = new Intent(this, SettingsActivity.class);
+            startActivity(openSettingsActivityIntent);
             return true;
         }
 

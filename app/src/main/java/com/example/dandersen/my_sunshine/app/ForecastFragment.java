@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.text.format.Time;
 import android.util.Log;
@@ -67,8 +68,13 @@ public class ForecastFragment extends Fragment {
         int id = item.getItemId();
 
         if (id == R.id.action_refresh) {
+            // Get location from settings
+            String location = PreferenceManager
+                    .getDefaultSharedPreferences(getActivity())
+                    .getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
+
             // Execute fetch weather task
-            new FetchWeatherTask().execute("94043");
+            new FetchWeatherTask().execute(location);
             return true;
         }
 
@@ -116,7 +122,12 @@ public class ForecastFragment extends Fragment {
             }
         });
 
-        new FetchWeatherTask().execute("94043");
+        // Get location from settings
+        String location = PreferenceManager
+                .getDefaultSharedPreferences(getActivity())
+                .getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
+
+        new FetchWeatherTask().execute(location);
 
         return rootView;
     }
@@ -240,6 +251,9 @@ public class ForecastFragment extends Fragment {
             if (params.length == 0) {
                 Log.v(LOG_TAG, "No postal code - returning");
                 return null;
+            }
+            else {
+                Log.v(LOG_TAG, "Postal code used: " + params[0]);
             }
 
             // These two need to be declared outside the try/catch

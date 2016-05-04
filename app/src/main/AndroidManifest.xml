@@ -21,6 +21,15 @@
         </activity>
         <activity
             android:name=".DetailActivity">
+            androdi:label="@string/title_activity_details"
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.dandersen.my_sunshine.app.MainActivity" />
+        </activity>
+        <activity
+            android:name=".SettingsActivity">
+            androdi:label="@string/title_activity_settings"
             android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

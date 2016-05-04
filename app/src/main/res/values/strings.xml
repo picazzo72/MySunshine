@@ -4,4 +4,22 @@
 
     // Menu label to fetch updated weather info from the service
     <string name="action_refresh" translatable="false">Refresh</string>
+
+    // Title for details activity
+    <string name="title_activity_details">Details</string>
+
+    // Title for settings activity
+    <string name="title_activity_settings">Settings</string>
+
+    // Label for the location preference [CHAR_LIMIT=30]
+    <string name="pref_location_label">Location</string>
+
+    // Key name for storing location in SharedPreferences [CHAR_LIMIT=NONE]
+    <string name="pref_location_key" translatable="false">location</string>
+
+    // Default postal code for location preference [CHAR_LIMIT=NONE]
+    <string name="pref_location_default" translatable="false">94043</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
