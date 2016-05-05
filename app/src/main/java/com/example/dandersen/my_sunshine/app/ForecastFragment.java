@@ -265,7 +265,12 @@ public class ForecastFragment extends Fragment {
             String forecastJsonStr = null;
 
             String format = "json";
-            String units = "metric";
+            // Get units from settings
+            String units = PreferenceManager
+                    .getDefaultSharedPreferences(getActivity())
+                    .getString(getString(R.string.pref_temperature_units_key), getString(R.string.pref_temperature_units_default));
+            Log.v(LOG_TAG, "Units are set to " + units);
+            //String units = "metric";
             int numDays = 7;
 
             final String kScheme = "http";
