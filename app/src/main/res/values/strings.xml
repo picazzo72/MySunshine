@@ -1,6 +1,11 @@
 <resources>
     <string name="app_name">Sunshine</string>
+
+    // Menu label for settings
     <string name="action_settings">Settings</string>
+
+    // Menu label to view the users preferred location on a map
+    <string name="action_view_preferred_location">View location</string>
 
     // Menu label to fetch updated weather info from the service
     <string name="action_refresh" translatable="false">Refresh</string>
@@ -37,4 +42,6 @@
 
     <!-- Value in SharedPreferences for imperial temperature unit option [CHAR LIMIT=NONE] -->
     <string name="pref_temperature_units_imperial" translatable="false">imperial</string>
+
+    <string name="error_msg_no_map">There is no map service available</string>
 </resources>
