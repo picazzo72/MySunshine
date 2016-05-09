@@ -7,6 +7,9 @@
     // Menu label to view the users preferred location on a map
     <string name="action_view_preferred_location">View location</string>
 
+    // Menu label to share
+    <string name="action_share">Share</string>
+
     // Menu label to fetch updated weather info from the service
     <string name="action_refresh" translatable="false">Refresh</string>
 
