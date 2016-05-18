@@ -10,8 +10,6 @@ import android.test.AndroidTestCase;
 
 import java.util.HashSet;
 
-import com.example.dandersen.my_sunshine.app.data.TestUtilities;
-
 public class TestDb extends AndroidTestCase {
 
     public static final String LOG_TAG = TestDb.class.getSimpleName();

@@ -36,7 +36,6 @@ public class DetailActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             // Start settings activity with explicit intent
             Intent openSettingsActivityIntent = new Intent(this, SettingsActivity.class);
