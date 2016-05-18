@@ -14,10 +14,25 @@ import com.example.dandersen.my_sunshine.app.data.WeatherDbHelper;
 public class MainActivity extends AppCompatActivity {
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
+    private static final String FORECASTFRAGMENT_TAG = "FORECASTFRAGMENT";
+    private String mLocation;
+
+    @Override
+    protected void onResume() {
+        if (mLocation != Utility.getPreferredLocation(this)) {
+            mLocation = Utility.getPreferredLocation(this);
+            ForecastFragment forecastFragment = (ForecastFragment) getSupportFragmentManager()
+                    .findFragmentByTag(FORECASTFRAGMENT_TAG);
+            forecastFragment.onLocationChanged();
+        }
+        super.onResume();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mLocation = Utility.getPreferredLocation(this);
 
         // Create SQLite database
         WeatherDbHelper weatherDbHelper = new WeatherDbHelper(this);
@@ -25,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new ForecastFragment())
+                    .add(R.id.container, new ForecastFragment(), FORECASTFRAGMENT_TAG)
                     .commit();
         }
     }
@@ -59,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void openPreferredLocationInMap() {
         String location = Utility.getPreferredLocation(this);
-        Log.v(LOG_TAG, "Map url: " + location.toString());
+        Log.v(LOG_TAG, "DSA LOG Map url: " + location.toString());
 
         // Using the URI scheme for showing a location found on a map.  This super-handy
         // intent can is detailed in the "Common Intents" page of Android's developer site:

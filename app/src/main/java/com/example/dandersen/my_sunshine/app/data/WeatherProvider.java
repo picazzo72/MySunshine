@@ -8,8 +8,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.util.Log;
 
 public class WeatherProvider extends ContentProvider {
+
+    private final String LOG_TAG = WeatherProvider.class.getSimpleName();
 
     // The URI Matcher used by this content provider.
     private static final UriMatcher sUriMatcher = buildUriMatcher();
@@ -68,6 +71,8 @@ public class WeatherProvider extends ContentProvider {
             selection = sLocationSettingWithStartDateSelection;
         }
 
+        Log.v(LOG_TAG, "DSA LOG WeatherProvider - weather by location setting");
+
         return sWeatherByLocationSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
                 selection,
@@ -83,6 +88,8 @@ public class WeatherProvider extends ContentProvider {
         String locationSetting = WeatherContract.WeatherEntry.getLocationSettingFromUri(uri);
         long date = WeatherContract.WeatherEntry.getDateFromUri(uri);
 
+        Log.v(LOG_TAG, "DSA LOG WeatherProvider - weather by location setting and date");
+
         return sWeatherByLocationSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
                 sLocationSettingAndDaySelection,
@@ -95,6 +102,8 @@ public class WeatherProvider extends ContentProvider {
 
     private Cursor getWeather(
             String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        Log.v(LOG_TAG, "DSA LOG WeatherProvider - weather");
+
         return mOpenHelper.getReadableDatabase().query(
                 WeatherContract.WeatherEntry.TABLE_NAME,
                 projection,
@@ -108,6 +117,8 @@ public class WeatherProvider extends ContentProvider {
 
     private Cursor getLocation(
             String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        Log.v(LOG_TAG, "DSA LOG WeatherProvider - location");
+
         return mOpenHelper.getReadableDatabase().query(
                 WeatherContract.LocationEntry.TABLE_NAME,
                 projection,

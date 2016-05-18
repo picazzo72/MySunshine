@@ -29,7 +29,7 @@ public class DetailFragment extends Fragment
     private final String LOG_TAG = DetailFragment.class.getSimpleName();
 
     private static final String FORECAST_SHARE_HASHTAG = " #SunshineApp";
-    private static final int CURSOR_LOADER_ID = 0;
+    private static final int DETAIL_LOADER_ID = 0;
     private String mForecast;
     private ShareActionProvider mShareActionProvider;
 
@@ -76,7 +76,7 @@ public class DetailFragment extends Fragment
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
+        getLoaderManager().initLoader(DETAIL_LOADER_ID, null, this);
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -146,7 +146,7 @@ public class DetailFragment extends Fragment
         }
 
         Uri detailWeatherUri = intent.getData();
-        Log.v(LOG_TAG, "Detail URI: " + detailWeatherUri.toString());
+        Log.v(LOG_TAG, "DSA LOG URI for detail view: " + detailWeatherUri.toString());
 
         return new CursorLoader(getActivity(),
                 detailWeatherUri,      // URI

@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -89,6 +90,8 @@ public class ForecastFragment extends Fragment
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.v(LOG_TAG, "DSA LOG onCreateLoader");
+
         // What location are we displaying weather for?
         String locationSetting = Utility.getPreferredLocation(getActivity());
 
@@ -98,6 +101,8 @@ public class ForecastFragment extends Fragment
         // Build Uri
         Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
                 locationSetting, System.currentTimeMillis());
+
+        Log.v(LOG_TAG, "DSA LOG URI for weather location w. start date: " + weatherForLocationUri.toString());
 
         return new CursorLoader(getActivity(),
                 weatherForLocationUri, // URI
@@ -112,11 +117,12 @@ public class ForecastFragment extends Fragment
         inflater.inflate(R.menu.forecastfragment, menu);
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        updateWeather();
-    }
+    // TODO: Remove this which would always fetch weather from the web service
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//        updateWeather();
+//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -171,7 +177,17 @@ public class ForecastFragment extends Fragment
         return rootView;
     }
 
+    public void onLocationChanged() {
+        // Update weather data
+        updateWeather();
+
+        // Restart loader to update UI
+        getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
+    }
+
     private void updateWeather() {
+        Log.v(LOG_TAG, "DSA LOG Weather is being updated");
+
         FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity());
         String location = Utility.getPreferredLocation(getActivity());
 
