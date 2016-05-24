@@ -222,7 +222,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
     protected Void doInBackground(String... params) {
         // If there's no zip code, there's nothing to look up.  Verify size of params.
         if (params.length == 0) {
-            Log.v(LOG_TAG, "DSA LOG doInBackground - no params");
+            Log.v(LOG_TAG, "DSA LOG - doInBackground - no params");
             return null;
         }
         String locationQuery = params[0];
@@ -261,7 +261,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
             URL url = new URL(builtUri.toString());
 
             // Log URL
-            Log.v(LOG_TAG, "DSA LOG Built URL for openweathermap " + url);
+            Log.v(LOG_TAG, "DSA LOG - Built URL for openweathermap " + url);
 
             // Create the request to OpenWeatherMap, and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -273,7 +273,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
             StringBuffer buffer = new StringBuffer();
             if (inputStream == null) {
                 // Nothing to do.
-                Log.v(LOG_TAG, "DSA LOG doInBackground - no inputStream");
+                Log.v(LOG_TAG, "DSA LOG - doInBackground - no inputStream");
                 return null;
             }
             reader = new BufferedReader(new InputStreamReader(inputStream));
@@ -288,15 +288,15 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
 
             if (buffer.length() == 0) {
                 // Stream was empty.  No point in parsing.
-                Log.v(LOG_TAG, "DSA LOG doInBackground - empty stream");
+                Log.v(LOG_TAG, "DSA LOG - doInBackground - empty stream");
                 return null;
             }
             forecastJsonStr = buffer.toString();
             getWeatherDataFromJson(forecastJsonStr, locationQuery);
         } catch (IOException e) {
-            Log.e(LOG_TAG, "DSA LOG doInBackground - Error ", e);
+            Log.e(LOG_TAG, "DSA LOG - doInBackground - Error ", e);
         } catch (JSONException e) {
-            Log.e(LOG_TAG, "DSA LOG doInBackground - Error ", e);
+            Log.e(LOG_TAG, "DSA LOG - doInBackground - Error ", e);
             e.printStackTrace();
         } finally {
             if (urlConnection != null) {

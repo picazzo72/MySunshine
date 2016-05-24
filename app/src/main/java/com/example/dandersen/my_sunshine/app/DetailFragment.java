@@ -2,7 +2,6 @@ package com.example.dandersen.my_sunshine.app;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -24,18 +23,17 @@ import android.widget.TextView;
 
 import com.example.dandersen.my_sunshine.app.data.WeatherContract;
 
-import org.w3c.dom.Text;
-
-
 public class DetailFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private final String LOG_TAG = DetailFragment.class.getSimpleName();
+    static final String DETAIL_URI = "URI";
 
     private static final String FORECAST_SHARE_HASHTAG = " #SunshineApp";
     private static final int DETAIL_LOADER_ID = 0;
     private String mForecast;
     private ShareActionProvider mShareActionProvider;
+    private Uri mUri;
 
     // For the forecast view we're showing only a small subset of the stored data.
     // Specify the columns we need.
@@ -107,6 +105,13 @@ public class DetailFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        // Get Uri from the arguments sent from the caller
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            mUri = arguments.getParcelable(DetailFragment.DETAIL_URI);
+        }
+
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
         // Set view holder for easy access to view items
@@ -204,19 +209,26 @@ public class DetailFragment extends Fragment
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Intent intent = getActivity().getIntent();
-        if (intent == null) {
-            return null;
+        if (mUri != null) {
+            Log.v(LOG_TAG, "DSA LOG - URI for detail view: " + mUri.toString());
+
+            return new CursorLoader(getActivity(),
+                    mUri,      // URI
+                    DETAIL_COLUMNS,        // projection
+                    null,                  // where
+                    null,                  // binds
+                    null);
         }
 
-        Uri detailWeatherUri = intent.getData();
-        Log.v(LOG_TAG, "DSA LOG URI for detail view: " + detailWeatherUri.toString());
+        return null;
+    }
 
-        return new CursorLoader(getActivity(),
-                detailWeatherUri,      // URI
-                DETAIL_COLUMNS,        // projection
-                null,                  // where
-                null,                  // binds
-                null);
+    void onLocationChanged(String newLocation) {
+        // replace the uri, since the location has changed
+        if (mUri != null) {
+            long date = WeatherContract.WeatherEntry.getDateFromUri(mUri);
+            mUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(newLocation, date);
+            getLoaderManager().restartLoader(DETAIL_LOADER_ID, null, this);
+        }
     }
 }

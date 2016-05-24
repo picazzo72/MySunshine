@@ -3,45 +3,91 @@ package com.example.dandersen.my_sunshine.app;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.dandersen.my_sunshine.app.data.WeatherDbHelper;
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+        implements ForecastFragment.Callback {
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
-    private static final String FORECASTFRAGMENT_TAG = "FORECASTFRAGMENT";
+    private static final String DETAILFRAGMENT_TAG = "DFTAG";
     private String mLocation;
+    private boolean mTwoPane;
 
     @Override
     protected void onResume() {
-        if (mLocation != Utility.getPreferredLocation(this)) {
-            mLocation = Utility.getPreferredLocation(this);
-            ForecastFragment forecastFragment = (ForecastFragment) getSupportFragmentManager()
-                    .findFragmentByTag(FORECASTFRAGMENT_TAG);
-            forecastFragment.onLocationChanged();
-        }
         super.onResume();
+
+        String location = Utility.getPreferredLocation(this);
+
+        if (mLocation != location) {
+            ForecastFragment forecastFragment = (ForecastFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.fragment_forecast);
+            if (forecastFragment != null) {
+                forecastFragment.onLocationChanged();
+            }
+
+            DetailFragment detailFragment = (DetailFragment) getSupportFragmentManager()
+                    .findFragmentByTag(DETAILFRAGMENT_TAG);
+            if (detailFragment != null) {
+                detailFragment.onLocationChanged(location);
+            }
+
+            mLocation = location;
+        }
+    }
+
+    @Override
+    public void onItemSelected(Uri contentUri) {
+        Log.v(LOG_TAG, "DSA LOG - MainActivity onItemSelected " + contentUri.toString());
+
+        if (mTwoPane) {
+            // In two-pane mode show the detail view in this activity by adding
+            // or replacing the detail fragment using a fragment transaction
+            Bundle arguments = new Bundle();
+            arguments.putParcelable(DetailFragment.DETAIL_URI, contentUri);
+
+            DetailFragment detailFragment = new DetailFragment();
+            detailFragment.setArguments(arguments);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.weather_detail_container, detailFragment, DETAILFRAGMENT_TAG)
+                    .commit();
+        }
+        else {
+            // Create and start explicit intent
+            Intent intent = new Intent(this, DetailActivity.class).setData(contentUri);
+            startActivity(intent);
+        }
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
         mLocation = Utility.getPreferredLocation(this);
 
-        // Create SQLite database
-        WeatherDbHelper weatherDbHelper = new WeatherDbHelper(this);
-
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new ForecastFragment(), FORECASTFRAGMENT_TAG)
-                    .commit();
+
+        if (findViewById(R.id.weather_detail_container) != null) {
+            // The detail container view will be present only in the large-screen layouts
+            // If this view is present, then the activity should be in two-pane mode
+            mTwoPane = true;
+
+            // Show the detail view in this activity by adding og replacing the
+            // detail fragment using a fragment transaction
+            if (savedInstanceState == null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.weather_detail_container, new DetailFragment())
+                        .commit();
+            }
+        }
+        else {
+            mTwoPane = false;
         }
     }
 
@@ -72,9 +118,20 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+
+        ListView listView = (ListView) findViewById(R.id.listview_forecast);
+        if (listView != null && listView.getCount() > 0) {
+            listView.setItemChecked(0, true);
+            listView.performItemClick(listView.getChildAt(0), 0, listView.getItemIdAtPosition(0));
+        }
+    }
+
     private void openPreferredLocationInMap() {
         String location = Utility.getPreferredLocation(this);
-        Log.v(LOG_TAG, "DSA LOG Map url: " + location.toString());
+        Log.v(LOG_TAG, "DSA LOG - Map url: " + location.toString());
 
         // Using the URI scheme for showing a location found on a map.  This super-handy
         // intent can is detailed in the "Common Intents" page of Android's developer site:

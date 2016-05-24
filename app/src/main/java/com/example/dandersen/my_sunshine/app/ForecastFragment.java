@@ -1,10 +1,8 @@
 package com.example.dandersen.my_sunshine.app;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -20,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.dandersen.my_sunshine.app.data.WeatherContract;
+
 
 /**
  * Created by Dan on 02-05-2016.
@@ -63,6 +62,20 @@ public class ForecastFragment extends Fragment
     static final int COL_COORD_LAT = 7;
     static final int COL_COORD_LONG = 8;
 
+
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of item
+     * selections.
+     */
+    public interface Callback {
+        /**
+         * DetailFragmentCallback for when an item has been selected.
+         */
+        public void onItemSelected(Uri dateUri);
+    }
+
+
     public ForecastFragment() {
     }
 
@@ -90,7 +103,7 @@ public class ForecastFragment extends Fragment
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.v(LOG_TAG, "DSA LOG onCreateLoader");
+        Log.v(LOG_TAG, "DSA LOG - ForecastFragment onCreateLoader");
 
         // What location are we displaying weather for?
         String locationSetting = Utility.getPreferredLocation(getActivity());
@@ -102,7 +115,7 @@ public class ForecastFragment extends Fragment
         Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
                 locationSetting, System.currentTimeMillis());
 
-        Log.v(LOG_TAG, "DSA LOG URI for weather location w. start date: " + weatherForLocationUri.toString());
+        Log.v(LOG_TAG, "DSA LOG - URI for weather location w. start date: " + weatherForLocationUri.toString());
 
         return new CursorLoader(getActivity(),
                 weatherForLocationUri, // URI
@@ -162,11 +175,10 @@ public class ForecastFragment extends Fragment
                 Cursor c = (Cursor) adapterView.getItemAtPosition(position);
                 if (c != null) {
                     String locationSetting = Utility.getPreferredLocation(getActivity());
-                    Intent intent = new Intent(getActivity(), DetailActivity.class)
-                            .setData(WeatherContract.WeatherEntry.buildWeatherLocationWithDate(
+                    Callback cb = (Callback) getActivity();
+                    cb.onItemSelected(WeatherContract.WeatherEntry.buildWeatherLocationWithDate(
                                     locationSetting, c.getLong(COL_WEATHER_DATE)
                             ));
-                    startActivity(intent);
                 }
             }
         });
@@ -186,7 +198,7 @@ public class ForecastFragment extends Fragment
     }
 
     private void updateWeather() {
-        Log.v(LOG_TAG, "DSA LOG Weather is being updated");
+        Log.v(LOG_TAG, "DSA LOG - Weather is being updated");
 
         FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity());
         String location = Utility.getPreferredLocation(getActivity());
