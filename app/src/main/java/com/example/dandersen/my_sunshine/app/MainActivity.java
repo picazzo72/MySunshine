@@ -3,23 +3,18 @@ package com.example.dandersen.my_sunshine.app;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ListView;
 import android.widget.Toast;
 
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements ForecastFragment.Callback {
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
     private static final String DETAILFRAGMENT_TAG = "DFTAG";
-    private static final String LIST_SELECTION_TAG = "ListSelection";
-    private static final String LIST_SCROLLING_TAG = "ListScrolling";
     private String mLocation;
     private boolean mTwoPane;
 
@@ -48,8 +43,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onItemSelected(Uri contentUri) {
-        Log.v(LOG_TAG, "DSA LOG - MainActivity onItemSelected " + contentUri.toString());
-
         if (mTwoPane) {
             // In two-pane mode show the detail view in this activity by adding
             // or replacing the detail fragment using a fragment transaction
