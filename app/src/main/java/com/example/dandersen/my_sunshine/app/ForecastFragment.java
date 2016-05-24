@@ -16,8 +16,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.dandersen.my_sunshine.app.data.WeatherContract;
+
+import java.util.List;
 
 
 /**
@@ -27,7 +30,14 @@ public class ForecastFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private ForecastAdapter mForecastAdapter;
+
+    private ListView mListView;
+    private int mPosition = ListView.INVALID_POSITION;
+
+    private static final String SELECTED_KEY = "selected_position";
+
     private final String LOG_TAG = ForecastFragment.class.getSimpleName();
+
     private static final int CURSOR_LOADER_ID = 0;
 
     // For the forecast view we're showing only a small subset of the stored data.
@@ -96,6 +106,26 @@ public class ForecastFragment extends Fragment
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        // Set location in GUI
+        String locationSetting = Utility.getPreferredLocation(getActivity());
+        TextView locationTextView = (TextView) getActivity().findViewById(R.id.location_text_view);
+        locationTextView.setText(locationSetting);
+
+        // Scroll to position if this is available
+        if (mPosition != ListView.INVALID_POSITION) {
+            mListView.smoothScrollToPosition(mPosition);
+        }
+        else {
+            if (mListView.getCount() > 0) {
+                mListView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mListView.performItemClick(mListView.getChildAt(0), 0, mListView.getChildAt(0).getId());
+                    }
+                });
+            }
+        }
+
         // Swap the new cursor in.  (The framework will take care of closing the
         // old cursor once we return.)
         mForecastAdapter.swapCursor(data);
@@ -105,13 +135,11 @@ public class ForecastFragment extends Fragment
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.v(LOG_TAG, "DSA LOG - ForecastFragment onCreateLoader");
 
-        // What location are we displaying weather for?
-        String locationSetting = Utility.getPreferredLocation(getActivity());
-
         // Sort order: Acending, by date
         String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC";
 
         // Build Uri
+        String locationSetting = Utility.getPreferredLocation(getActivity());
         Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
                 locationSetting, System.currentTimeMillis());
 
@@ -155,19 +183,18 @@ public class ForecastFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // The CursorAdapter will take data from our cursor and populate the ListView
-        // However, we cannot use FLAG_AUTO_REQUERY since it is deprecated, so we will end
-        // up with an empty list the first time we run
+        // The CursorAdapter will take data from a source and
+        // use it to populate the ListView it's attached to
         mForecastAdapter = new ForecastAdapter(getActivity(), null, 0);
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         // Get a reference to the ListView, and attach this adapter to it
-        ListView listView = (ListView)rootView.findViewById(R.id.listview_forecast);
-        listView.setAdapter(mForecastAdapter);
+        mListView = (ListView)rootView.findViewById(R.id.listview_forecast);
+        mListView.setAdapter(mForecastAdapter);
 
         // Create on item click listener for the ListView
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView adapterView, View view, int position, long l) {
                 // CursorAdapter returns a cursor at the correct position for getItem(), or null
@@ -180,8 +207,20 @@ public class ForecastFragment extends Fragment
                                     locationSetting, c.getLong(COL_WEATHER_DATE)
                             ));
                 }
+                mPosition = position;
             }
         });
+
+        // If there's instance state, mine it for useful information.
+        // The end-goal here is that the user never knows that turning their device sideways
+        // does crazy lifecycle related things. It should feel like some stuff stretched out,
+        // or magically appeared to take advantage of room, but data or place in the app was never
+        // actually *lost*.
+        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
+            // The listview probably hasn't even been populated yet.  Actually perform the
+            // swapout in onLoadFinished.
+            mPosition = savedInstanceState.getInt(SELECTED_KEY);
+        }
 
         // Prepare the loader.  Either re-connect with an existing one, or start a new one.
         getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
@@ -205,6 +244,14 @@ public class ForecastFragment extends Fragment
 
         // Execute fetch weather task
         weatherTask.execute(location);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        if (mPosition != ListView.INVALID_POSITION) {
+            savedInstanceState.putInt(SELECTED_KEY, mPosition);
+        }
+        super.onSaveInstanceState(savedInstanceState);
     }
 
 }

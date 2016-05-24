@@ -11,11 +11,15 @@ import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity
         implements ForecastFragment.Callback {
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
     private static final String DETAILFRAGMENT_TAG = "DFTAG";
+    private static final String LIST_SELECTION_TAG = "ListSelection";
+    private static final String LIST_SCROLLING_TAG = "ListScrolling";
     private String mLocation;
     private boolean mTwoPane;
 
@@ -116,17 +120,6 @@ public class MainActivity extends AppCompatActivity
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-
-        ListView listView = (ListView) findViewById(R.id.listview_forecast);
-        if (listView != null && listView.getCount() > 0) {
-            listView.setItemChecked(0, true);
-            listView.performItemClick(listView.getChildAt(0), 0, listView.getItemIdAtPosition(0));
-        }
     }
 
     private void openPreferredLocationInMap() {
