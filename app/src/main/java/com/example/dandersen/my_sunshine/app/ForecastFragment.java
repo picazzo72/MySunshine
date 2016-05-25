@@ -33,9 +33,15 @@ public class ForecastFragment extends Fragment
 
     private ForecastAdapter mForecastAdapter;
 
+    private boolean mTwoPaneLayout = false;
+
+    // Our forecast list view
     private ListView mListView;
+
+    // Keeping track of the selected item
     private int mPosition = ListView.INVALID_POSITION;
 
+    // Tag for save instance bundle
     private static final String SELECTED_KEY = "selected_position";
 
     private final String LOG_TAG = ForecastFragment.class.getSimpleName();
@@ -93,6 +99,13 @@ public class ForecastFragment extends Fragment
     public ForecastFragment() {
     }
 
+    public void setTwoPaneLayout(boolean twoPaneLayout) {
+        mTwoPaneLayout = twoPaneLayout;
+        if (mForecastAdapter != null) {
+            mForecastAdapter.setTwoPaneLayout(twoPaneLayout);
+        }
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -130,7 +143,7 @@ public class ForecastFragment extends Fragment
                     mRestartingLoader = false;
                     if (mListSelection < mListView.getCount()) {
                         mPosition = mListSelection;
-                        if (mListView.getChoiceMode() == ListView.CHOICE_MODE_SINGLE) {
+                        if (mTwoPaneLayout) {
                             mListView.performItemClick(
                                     mListView.getChildAt(mPosition),
                                     mPosition,
@@ -201,6 +214,7 @@ public class ForecastFragment extends Fragment
         // The CursorAdapter will take data from a source and
         // use it to populate the ListView it's attached to
         mForecastAdapter = new ForecastAdapter(getActivity(), null, 0);
+        mForecastAdapter.setTwoPaneLayout(mTwoPaneLayout);
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 

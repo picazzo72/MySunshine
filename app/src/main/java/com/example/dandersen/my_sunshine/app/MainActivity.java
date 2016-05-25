@@ -89,6 +89,14 @@ public class MainActivity extends AppCompatActivity
         }
         else {
             mTwoPane = false;
+            getSupportActionBar().setElevation(0f);
+        }
+
+        // Let forecast fragment know if we are in a two pane layout (tablet)
+        if (savedInstanceState == null) {
+            ForecastFragment forecastFragment = (ForecastFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.fragment_forecast);
+            forecastFragment.setTwoPaneLayout(mTwoPane);
         }
     }
 
