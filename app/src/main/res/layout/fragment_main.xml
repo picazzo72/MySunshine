@@ -8,24 +8,10 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".ForecastFragment">
 
-    <LinearLayout
+    <ListView
+        style="@style/ForecastListStyle"
+        android:id="@+id/listview_forecast"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/location_text_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:paddingBottom="16dp" />
-
-        <ListView
-            style="@style/ForecastListStyle"
-            android:id="@+id/listview_forecast"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-    </LinearLayout>
+        android:layout_height="match_parent" />
 
 </FrameLayout>

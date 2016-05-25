@@ -71,7 +71,11 @@ public class WeatherProvider extends ContentProvider {
             selection = sLocationSettingWithStartDateSelection;
         }
 
-        Log.v(LOG_TAG, "DSA LOG - WeatherProvider - weather by location setting");
+        StringBuilder selectionArgsBuilder = new StringBuilder();
+        for (int i = 0; i < selectionArgs.length; i++) {
+            selectionArgsBuilder.append(selectionArgs[i] + ", ");
+        }
+        Log.v(LOG_TAG, "DSA LOG - Weather by location setting '" + selection + "' binds: " + selectionArgsBuilder.toString());
 
         return sWeatherByLocationSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
@@ -88,7 +92,7 @@ public class WeatherProvider extends ContentProvider {
         String locationSetting = WeatherContract.WeatherEntry.getLocationSettingFromUri(uri);
         long date = WeatherContract.WeatherEntry.getDateFromUri(uri);
 
-        Log.v(LOG_TAG, "DSA LOG - WeatherProvider - weather by location setting and date");
+        Log.v(LOG_TAG, "DSA LOG - Weather by location setting and date");
 
         return sWeatherByLocationSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
@@ -102,7 +106,7 @@ public class WeatherProvider extends ContentProvider {
 
     private Cursor getWeather(
             String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        Log.v(LOG_TAG, "DSA LOG - WeatherProvider - weather");
+        Log.v(LOG_TAG, "DSA LOG - Weather list");
 
         return mOpenHelper.getReadableDatabase().query(
                 WeatherContract.WeatherEntry.TABLE_NAME,
@@ -117,7 +121,7 @@ public class WeatherProvider extends ContentProvider {
 
     private Cursor getLocation(
             String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        Log.v(LOG_TAG, "DSA LOG - WeatherProvider - location");
+        Log.v(LOG_TAG, "DSA LOG - Location " + selection);
 
         return mOpenHelper.getReadableDatabase().query(
                 WeatherContract.LocationEntry.TABLE_NAME,

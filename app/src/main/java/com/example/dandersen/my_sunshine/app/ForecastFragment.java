@@ -7,6 +7,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -39,6 +41,8 @@ public class ForecastFragment extends Fragment
     private final String LOG_TAG = ForecastFragment.class.getSimpleName();
 
     private static final int CURSOR_LOADER_ID = 0;
+
+    private boolean mRestartingLoader = false;
 
     // For the forecast view we're showing only a small subset of the stored data.
     // Specify the columns we need.
@@ -106,25 +110,38 @@ public class ForecastFragment extends Fragment
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        // Set location in GUI
-        String locationSetting = Utility.getPreferredLocation(getActivity());
-        TextView locationTextView = (TextView) getActivity().findViewById(R.id.location_text_view);
-        locationTextView.setText(locationSetting);
+        Log.v(LOG_TAG, "DSA LOG - onLoadFinished");
 
-        // Scroll to position if this is available
+        // Select first item or last selected if this is available
+        int listSelection = 0;
         if (mPosition != ListView.INVALID_POSITION) {
-            mListView.smoothScrollToPosition(mPosition);
+            listSelection = mPosition;
         }
-        else {
-            if (mListView.getCount() > 0) {
-                mListView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mListView.performItemClick(mListView.getChildAt(0), 0, mListView.getChildAt(0).getId());
+        class SelectListItem implements Runnable {
+            int mListSelection;
+            SelectListItem(int sel) { mListSelection = sel; }
+            public void run() {
+                if (!mRestartingLoader && mListView.getCount() == 0) {
+                    // If there are no items in the list we update the database with weather info
+                    mRestartingLoader = true; // Boolean to ensure that we do not loop indefinitely
+                    onLocationChanged();
+                }
+                else {
+                    mRestartingLoader = false;
+                    if (mListSelection < mListView.getCount()) {
+                        mPosition = mListSelection;
+                        if (mListView.getChoiceMode() == ListView.CHOICE_MODE_SINGLE) {
+                            mListView.performItemClick(
+                                    mListView.getChildAt(mPosition),
+                                    mPosition,
+                                    mListView.getChildAt(mPosition).getId());
+                        }
+                        mListView.smoothScrollToPosition(mPosition);
                     }
-                });
+                }
             }
         }
+        mListView.post(new SelectListItem(listSelection));
 
         // Swap the new cursor in.  (The framework will take care of closing the
         // old cursor once we return.)
@@ -133,8 +150,6 @@ public class ForecastFragment extends Fragment
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.v(LOG_TAG, "DSA LOG - ForecastFragment onCreateLoader");
-
         // Sort order: Acending, by date
         String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC";
 
@@ -143,7 +158,7 @@ public class ForecastFragment extends Fragment
         Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
                 locationSetting, System.currentTimeMillis());
 
-        Log.v(LOG_TAG, "DSA LOG - URI for weather location w. start date: " + weatherForLocationUri.toString());
+        Log.v(LOG_TAG, "DSA LOG - onCreateLoader - URI for weather location w. start date: " + weatherForLocationUri.toString());
 
         return new CursorLoader(getActivity(),
                 weatherForLocationUri, // URI
@@ -229,6 +244,11 @@ public class ForecastFragment extends Fragment
     }
 
     public void onLocationChanged() {
+        // Update location in action bar
+        String location = Utility.getPreferredLocation(getActivity());
+        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        actionBar.setSubtitle(location);
+
         // Update weather data
         updateWeather();
 

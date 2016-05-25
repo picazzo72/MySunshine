@@ -210,7 +210,7 @@ public class DetailFragment extends Fragment
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if (mUri != null) {
-            Log.v(LOG_TAG, "DSA LOG - URI for detail view: " + mUri.toString());
+            Log.v(LOG_TAG, "DSA LOG - onCreateLoader - URI for detail view: " + mUri.toString());
 
             return new CursorLoader(getActivity(),
                     mUri,      // URI

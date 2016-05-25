@@ -294,9 +294,9 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
             forecastJsonStr = buffer.toString();
             getWeatherDataFromJson(forecastJsonStr, locationQuery);
         } catch (IOException e) {
-            Log.e(LOG_TAG, "DSA LOG - doInBackground - Error ", e);
+            Log.e(LOG_TAG, "DSA LOG - doInBackground - IOException " + e.toString(), e);
         } catch (JSONException e) {
-            Log.e(LOG_TAG, "DSA LOG - doInBackground - Error ", e);
+            Log.e(LOG_TAG, "DSA LOG - doInBackground - JSONException " + e.toString(), e);
             e.printStackTrace();
         } finally {
             if (urlConnection != null) {
